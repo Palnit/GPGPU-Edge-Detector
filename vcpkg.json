@@ -3,6 +3,9 @@
   "name": "gpgpuedgedetector",
   "version": "0.0.1",
   "dependencies": [
+    "opengl",
+    "glew",
+    "glm",
     "sdl2",
     {
       "name": "sdl2-image",

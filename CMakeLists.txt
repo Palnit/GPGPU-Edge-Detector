@@ -18,11 +18,16 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(HEADER_FILES
         include/gpu_info.h
-        include/setup_window.h)
+        include/basic_window.h
+        include/SDL_GLDebugMessageCallback.h
+        include/main_window.h)
 
 set(SOURCE_FILES
         src/main.cpp
-        src/gpu_info.cpp src/setup_window.cpp)
+        src/gpu_info.cpp
+        src/basic_window.cpp
+        src/SDL_GLDebugMessageCallback.cpp
+        src/main_window.cpp)
 
 set(CUDA_HEADER_FILES
 
@@ -35,7 +40,10 @@ set(CUDA_SOURCE_FILES
 find_package(CUDAToolkit REQUIRED)
 find_package(SDL2 CONFIG REQUIRED)
 find_package(SDL2_image CONFIG REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(glm CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
+find_package(OpenGL REQUIRED)
 
 add_executable(${CMAKE_PROJECT_NAME}
         ${SOURCE_FILES}
@@ -50,6 +58,9 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
         $<IF:$<TARGET_EXISTS:SDL2_image::SDL2_image>,SDL2_image::SDL2_image,SDL2_image::SDL2_image-static>
         imgui::imgui
+        GLEW::GLEW
+        glm::glm
+        OpenGL::GL
         )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
