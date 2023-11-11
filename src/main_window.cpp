@@ -3,31 +3,33 @@
 //
 
 #include "include/main_window.h"
+#include <implot.h>
 void MainWindow::Render() {
 
     glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
-
+    glViewport(0, 0, m_w, m_h);
+    glCullFace(GL_BACK);
     glClear(GL_COLOR_BUFFER_BIT);
     glBindTexture(GL_TEXTURE_2D, test);
     glEnable(GL_TEXTURE_2D);
     glBegin(GL_TRIANGLES);
 
-    glTexCoord2i(1, 1);
+    glTexCoord2i(0, 0);
     glVertex2i(-1, -1);
 
     glTexCoord2i(1, 0);
     glVertex2i(-1, 1);
 
-    glTexCoord2i(0, 0);
+    glTexCoord2i(1, 1);
     glVertex2i(1, 1);
 
-    glTexCoord2i(0, 0);
+    glTexCoord2i(1, 1);
     glVertex2i(1, 1);
 
     glTexCoord2i(0, 1);
     glVertex2i(1, -1);
 
-    glTexCoord2i(1, 1);
+    glTexCoord2i(0, 0);
     glVertex2i(-1, -1);
 
     glEnd();
@@ -40,17 +42,11 @@ int MainWindow::Init() {
     SDL_Surface* loaded_img = IMG_Load("img.jpg");
     int img_mode = 0;
 
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
     if (loaded_img->format->BytesPerPixel == 4)
-        img_mode = GL_BGRA;
+        img_mode = GL_RGBA;
     else
-        img_mode = GL_BGR;
-#else
-    if ( loaded_img->format->BytesPerPixel == 4 )
-            img_mode = GL_RGBA;
-        else
-            img_mode = GL_RGB;
-#endif
+        img_mode = GL_RGB;
+
     GLuint tex;
     glGenTextures(1, &tex);
 
@@ -65,9 +61,16 @@ int MainWindow::Init() {
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    tw = loaded_img->w;
+    th = loaded_img->h;
 
     SDL_FreeSurface(loaded_img);
     test = tex;
 
     return 0;
+}
+void MainWindow::RenderImGui() {
+    bool t = true;
+    ImGui::ShowMetricsWindow(&t);
+
 }

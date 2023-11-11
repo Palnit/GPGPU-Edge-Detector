@@ -14,6 +14,7 @@
 #include <imgui.h>
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_opengl3.h>
+#include <implot.h>
 
 inline void HandelSDLError(const char* type) {
     SDL_LogError(SDL_LOG_CATEGORY_ERROR,
@@ -38,8 +39,12 @@ BasicWindow::BasicWindow(const char* title,
 
 }
 int BasicWindow::run() {
-
+    if (Init()) {
+        return 1;
+    }
     m_running = true;
+    double fpsCount = 0;
+    Uint64 fpsLastTime = SDL_GetTicks64();
     ImGuiIO& io = ImGui::GetIO();
     while (m_running) {
         while (SDL_PollEvent(&m_ev)) {
@@ -87,6 +92,14 @@ int BasicWindow::run() {
 
             Time::DeltaTime = SDL_GetTicks64() - Time::ElapsedTime;
             Time::ElapsedTime = SDL_GetTicks64();
+            double diff = (Time::ElapsedTime - fpsLastTime) * 0.001;
+            fpsCount++;
+            if (diff >= 1.0 / 30.0) {
+                Time::FPS = (1.0 / diff) * fpsCount;
+                Time::Ms = (diff / fpsCount) * 1000;
+                fpsLastTime = Time::ElapsedTime;
+                fpsCount = 0;
+            }
 
             Update();
             Render();
@@ -112,6 +125,10 @@ BasicWindow::~BasicWindow() {
     if (m_context != nullptr) {
         SDL_GL_DeleteContext(m_context);
     }
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImPlot::DestroyContext();
+    ImGui::DestroyContext();
     SDL_Quit();
 }
 int BasicWindow::Init() {
@@ -182,8 +199,10 @@ int BasicWindow::Init() {
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImPlot::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |=
+        ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_DockingEnable;
 
     ImGui::StyleColorsDark();
     ImGui_ImplSDL2_InitForOpenGL(m_window, m_context);

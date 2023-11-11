@@ -14,6 +14,8 @@
 #include <glm/glm.hpp>
 
 #include <imgui.h>
+#include <implot.h>
+#include <vector>
 
 inline void HandelSDLError(const char* type);
 
@@ -21,6 +23,8 @@ class Time {
 public:
     static inline Uint64 ElapsedTime = 0;
     static inline Uint64 DeltaTime = 0;
+    static inline double FPS = 0;
+    static inline double Ms = 0;
 };
 
 class BasicWindow {

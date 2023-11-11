@@ -44,6 +44,7 @@ find_package(GLEW REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(implot CONFIG REQUIRED)
 
 add_executable(${CMAKE_PROJECT_NAME}
         ${SOURCE_FILES}
@@ -61,6 +62,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         GLEW::GLEW
         glm::glm
         OpenGL::GL
+        implot::implot
         )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
