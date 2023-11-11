@@ -21,8 +21,7 @@ public:
     void RenderImGui() override;
 private:
     GLuint test = 0;
-    int tw;
-    int th;
+
 };
 
 #endif //GPGPU_EDGE_DETECTOR_INCLUDE_MAIN_WINDOW_H_

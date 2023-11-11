@@ -14,22 +14,22 @@ void MainWindow::Render() {
     glEnable(GL_TEXTURE_2D);
     glBegin(GL_TRIANGLES);
 
-    glTexCoord2i(0, 0);
+    glTexCoord2i(1, 1);
     glVertex2i(-1, -1);
 
     glTexCoord2i(1, 0);
     glVertex2i(-1, 1);
 
-    glTexCoord2i(1, 1);
+    glTexCoord2i(0, 0);
     glVertex2i(1, 1);
 
-    glTexCoord2i(1, 1);
+    glTexCoord2i(0, 0);
     glVertex2i(1, 1);
 
     glTexCoord2i(0, 1);
     glVertex2i(1, -1);
 
-    glTexCoord2i(0, 0);
+    glTexCoord2i(1, 1);
     glVertex2i(-1, -1);
 
     glEnd();
@@ -47,6 +47,33 @@ int MainWindow::Init() {
     else
         img_mode = GL_RGB;
 
+    printf("b/p %d", loaded_img->format->BytesPerPixel);
+
+    int bpp = loaded_img->format->BytesPerPixel;
+    SDL_PixelFormat* fmt;
+    fmt = loaded_img->format;
+    /* Here p is the address to the pixel we want to retrieve */
+    uint8_t* pixel;
+    uint8_t red, green, blue;
+    auto a = SDL_GetTicks64();
+    for (int i = 0; i < (loaded_img->h - 1); ++i) {
+        for (int j = 0; j < (loaded_img->w - 1); ++j) {
+
+            pixel = (Uint8*) loaded_img->pixels + i * loaded_img->pitch
+                + j * bpp;
+
+            red = pixel[0];
+            green = pixel[1];
+            blue = pixel[2];
+
+            pixel[0] = pixel[1] = pixel[2] = (red + green + blue) / 3;
+
+        }
+    }
+
+    auto b = SDL_GetTicks64();
+    printf("Time: %f", (b - a) * 0.0001);
+
     GLuint tex;
     glGenTextures(1, &tex);
 
@@ -61,8 +88,6 @@ int MainWindow::Init() {
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    tw = loaded_img->w;
-    th = loaded_img->h;
 
     SDL_FreeSurface(loaded_img);
     test = tex;
