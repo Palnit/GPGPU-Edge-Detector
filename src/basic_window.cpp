@@ -26,16 +26,16 @@ inline void HandelSDLError(const char* type) {
 BasicWindow::BasicWindow(const char* title,
                          int x,
                          int y,
-                         int w,
-                         int h,
-                         Uint32 flags) {
+                         int width,
+                         int height,
+                         Uint32 flags)
+    : m_title(title),
+      m_x(x),
+      m_y(y),
+      m_width(width),
+      m_height(height),
+      m_flags(flags) {
     SDL_LogSetPriority(SDL_LOG_CATEGORY_ERROR, SDL_LOG_PRIORITY_ERROR);
-    m_title = title;
-    m_x = x;
-    m_y = y;
-    m_w = w;
-    m_h = h;
-    m_flags = flags;
 
 }
 int BasicWindow::run() {
@@ -84,7 +84,7 @@ int BasicWindow::run() {
                 case SDL_WINDOWEVENT:
                     if ((m_ev.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
                         || (m_ev.window.event == SDL_WINDOWEVENT_SHOWN)) {
-                        SDL_GetWindowSize(m_window, &m_w, &m_h);
+                        SDL_GetWindowSize(m_window, &m_width, &m_height);
                         Resize();
                     }
                     break;
@@ -159,7 +159,12 @@ int BasicWindow::Init() {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-    m_window = SDL_CreateWindow(m_title, m_x, m_y, m_w, m_h, m_flags);
+    m_window = SDL_CreateWindow(m_title,
+                                m_x,
+                                m_y,
+                                m_width,
+                                m_height,
+                                m_flags | SDL_WINDOW_OPENGL);
 
     if (m_window == nullptr) {
         HandelSDLError("Window initialization");
