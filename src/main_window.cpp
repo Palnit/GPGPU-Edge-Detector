@@ -20,27 +20,52 @@ int MainWindow::Init() {
 #endif
 
     SDL_Surface* nloaded_img = SDL_ConvertSurfaceFormat(loaded_img, format, 0);
-    auto a = SDL_GetTicks64();
+
     uint8_t* h_pixel = 0;
-    cudaError asd2 = cudaMalloc((void**) h_pixel,
-                                1);
-    if (asd2 == cudaErrorInvalidValue) {
-        printf("yay");
-    }
+    auto a = SDL_GetTicks64();
+    cudaError asd2 = cudaMalloc((void**) &h_pixel,
+                                sizeof(uint8_t) * nloaded_img->w
+                                    * nloaded_img->h
+                                    * nloaded_img->format->BytesPerPixel);
     cudaMemcpy(h_pixel,
                nloaded_img->pixels,
-               1,
+               sizeof(uint8_t) * nloaded_img->w * nloaded_img->h
+                   * nloaded_img->format->BytesPerPixel,
                cudaMemcpyHostToDevice);
-    test(1, 10, h_pixel);
+    dim3 threads(32, 32);
+    dim3 block
+        (nloaded_img->w / threads.x + (nloaded_img->w % threads.x == 0 ? 0 : 1),
+         nloaded_img->h / threads.y
+             + (nloaded_img->h % threads.y == 0 ? 0 : 1));
+
+    test(block, threads, h_pixel, nloaded_img->w * nloaded_img->h);
+
+    cudaMemcpy(nloaded_img->pixels,
+               h_pixel,
+               sizeof(uint8_t) * nloaded_img->w * nloaded_img->h
+                   * nloaded_img->format->BytesPerPixel,
+               cudaMemcpyDeviceToHost);
+    auto b = SDL_GetTicks64();
+    printf("Time: %f\n", (b - a) * 0.0001);
     cudaFree(h_pixel);
     uint8_t grey;
     RGBA* color;
-    for (int i = 0; i < (nloaded_img->w - 1); ++i) {
+    /*for (int i = 0; i < (nloaded_img->w - 1); ++i) {
         for (int j = 0; j < (nloaded_img->h - 1); ++j) {
             color =
                 (RGBA*) (Uint32*) ((Uint8*) nloaded_img->pixels
                     + i * nloaded_img->format->BytesPerPixel
                     + j * nloaded_img->pitch);
+
+            if (i < 10 & j < 10) {
+
+                std::printf("cpu : %d,%d,%d,%d,%d\n",
+                            i * j,
+                            color->r,
+                            color->g,
+                            color->b,
+                            color->a);
+            }
 
             /*alpha = (*pixel & 0xFF000000) >> 24;
             blue = (*pixel & 0x00FF0000) >> 16;
@@ -50,14 +75,13 @@ int MainWindow::Init() {
             grey = (0.299 * red) + (0.587 * green) + (0.114 * blue);
             *pixel = (alpha << 24) | (grey << 16) | (grey << 8) | grey;*/
 
-            color->r = color->g = color->b =
-                0.299 * color->r
-                    + 0.587 * color->g
-                    + 0.114 * color->b;
-        }
-    }
-    auto b = SDL_GetTicks64();
-    printf("Time: %f\n", (b - a) * 0.0001);
+    /*color->r = color->g = color->b =
+        0.299 * color->r
+            + 0.587 * color->g
+            + 0.114 * color->b;
+}
+}*/
+
     GLuint tex;
     glGenTextures(1, &tex);
 

@@ -13,14 +13,21 @@ typedef struct RGBA {
     uint8_t a;
 } RGBA;
 
-__global__ void convertToGreyScale(uint8_t* asd) {
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
-
-    RGBA* asd2 = (RGBA*) (int32_t*) ((uint8_t*) asd);
-    std::printf("%d,%d,%d,%d,%d\n", idx, asd2->r, asd2->g, asd2->b, asd2->a);
+__global__ void convertToGreyScale(uint8_t* asd, int n) {
+    uint32_t x = blockIdx.x * blockDim.x + threadIdx.x;
+    uint32_t y = blockIdx.y * blockDim.y + threadIdx.y;
+    uint32_t idx = y * blockDim.x * gridDim.x + x;
+    if (idx > n) {
+        return;
+    }
+    RGBA* color = (RGBA*) (int32_t*) ((uint8_t*) asd + (idx * 4));
+    color->r = color->g = color->b =
+        0.299 * color->r
+            + 0.587 * color->g
+            + 0.114 * color->b;
 }
 
-void test(int a, int b, uint8_t* asd) {
-    convertToGreyScale<<<a, b>>>(asd);
+void test(dim3 a, dim3 b, uint8_t* asd, int n) {
+    convertToGreyScale<<<a, b>>>(asd, n);
     cudaDeviceSynchronize();
 }
