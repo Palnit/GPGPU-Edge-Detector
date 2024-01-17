@@ -1,8 +1,8 @@
 //
-// Created by Balint on 2023. 11. 11..
+// Created by Palnit on 2023. 11. 11.
 //
 
-#include "include/gpu_info.h"
+#include "include/cuda/gpu_info.h"
 
 #include <cuda_runtime.h>
 #include <cuda.h>

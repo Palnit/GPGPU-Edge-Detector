@@ -1,5 +1,5 @@
-#include "include/main_window.h"
-#include "include/gpu_info.h"
+#include "include/general//main_window.h"
+#include "include/cuda/gpu_info.h"
 
 int main(int argc, char* args[]) {
     GetGpuInfo();

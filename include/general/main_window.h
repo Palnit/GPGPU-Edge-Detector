@@ -1,10 +1,13 @@
 //
-// Created by Balint on 2023. 11. 11..
+// Created by Palnit on 2023. 11. 11.
 //
 
 #ifndef GPGPU_EDGE_DETECTOR_INCLUDE_MAIN_WINDOW_H_
 #define GPGPU_EDGE_DETECTOR_INCLUDE_MAIN_WINDOW_H_
-#include "include/basic_window.h"
+#include "include/general/OpenGL_SDL/basic_window.h"
+#include "include/general/detector_base.h"
+#include "include/cuda/detector_cuda.h"
+#include "include/general/OpenGL_SDL/file_handling.h"
 
 class MainWindow : public BasicWindow {
 
@@ -21,6 +24,7 @@ public:
     void RenderImGui() override;
 private:
     GLuint texture = 0;
+    DetectorCuda* m_det;
 
 };
 

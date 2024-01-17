@@ -1,48 +1,45 @@
 //
-// Created by Balint on 2023. 11. 11..
+// Created by Palnit on 2023. 11. 11.
 //
 
-#include "include/basic_window.h"
-#include "include/SDL_GLDebugMessageCallback.h"
+#include "include/general/OpenGL_SDL/basic_window.h"
+#include "include/general/OpenGL_SDL/SDL_GLDebugMessageCallback.h"
+#include "include/general/OpenGL_SDL/generic_structs.h"
 
-#include <SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_rwops.h>
+#include "vcpkg_installed/x64-windows/include/SDL2/SDL.h"
+#include "vcpkg_installed/x64-windows/include/SDL2/SDL_image.h"
+#include "vcpkg_installed/x64-windows/include/SDL2/SDL_rwops.h"
 
-#include <GL/glew.h>
+#include "vcpkg_installed/x64-windows/include/GL/glew.h"
 
-#include <imgui.h>
-#include <imgui_impl_sdl2.h>
-#include <imgui_impl_opengl3.h>
-#include <implot.h>
-
-inline void HandelSDLError(const char* type) {
-    SDL_LogError(SDL_LOG_CATEGORY_ERROR,
-                 "[%s] Error during the SDL initialization: %s",
-                 type,
-                 SDL_GetError());
-}
+#include "vcpkg_installed/x64-windows/include/imgui.h"
+#include "vcpkg_installed/x64-windows/include/imgui_impl_sdl2.h"
+#include "vcpkg_installed/x64-windows/include/imgui_impl_opengl3.h"
+#include "vcpkg_installed/x64-windows/include/implot.h"
 
 BasicWindow::BasicWindow(const char* title,
                          int x,
                          int y,
                          int width,
                          int height,
-                         Uint32 flags)
+                         uint32_t flags)
     : m_title(title),
       m_x(x),
       m_y(y),
       m_width(width),
       m_height(height),
-      m_flags(flags) {
+      m_flags(flags),
+      m_running(true) {
     SDL_LogSetPriority(SDL_LOG_CATEGORY_ERROR, SDL_LOG_PRIORITY_ERROR);
 
 }
 int BasicWindow::run() {
+    if (InitWindow()) {
+        return 1;
+    }
     if (Init()) {
         return 1;
     }
-    m_running = true;
     double fpsCount = 0;
     Uint64 fpsLastTime = SDL_GetTicks64();
     ImGuiIO& io = ImGui::GetIO();
@@ -131,15 +128,15 @@ BasicWindow::~BasicWindow() {
     ImGui::DestroyContext();
     SDL_Quit();
 }
-int BasicWindow::Init() {
+int BasicWindow::InitWindow() {
 
     if (SDL_Init(SDL_INIT_VIDEO) == -1) {
-        HandelSDLError("SDL initialization");
+        ErrorHandling::HandelSDLError("SDL initialization");
         return 1;
     }
 
     if (IMG_Init(IMG_INIT_JPG) == 0) {
-        HandelSDLError("SDL IMG initialization");
+        ErrorHandling::HandelSDLError("SDL IMG initialization");
         return 1;
     }
 
@@ -167,14 +164,14 @@ int BasicWindow::Init() {
                                 m_flags | SDL_WINDOW_OPENGL);
 
     if (m_window == nullptr) {
-        HandelSDLError("Window initialization");
+        ErrorHandling::HandelSDLError("Window initialization");
         return 1;
     }
 
     m_context = SDL_GL_CreateContext(m_window);
 
     if (m_context == nullptr) {
-        HandelSDLError("GL Context initialization");
+        ErrorHandling::HandelSDLError("GL Context initialization");
         return 1;
     }
 

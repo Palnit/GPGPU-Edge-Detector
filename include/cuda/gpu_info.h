@@ -1,5 +1,5 @@
 //
-// Created by Balint on 2023. 11. 11..
+// Created by Palnit on 2023. 11. 11.
 //
 
 #ifndef GPU_INFO_H_
