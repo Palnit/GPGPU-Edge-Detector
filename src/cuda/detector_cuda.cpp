@@ -22,14 +22,8 @@ void DetectorCuda::DetectEdge() {
                    * m_base->format->BytesPerPixel,
                cudaMemcpyHostToDevice);
 
-    dim3 threads(32, 32);
-    dim3 block
-        (m_base->w / threads.x + (m_base->w % threads.x == 0 ? 0 : 1),
-         m_base->h / threads.y
-             + (m_base->h % threads.y == 0 ? 0 : 1));
-
     auto a = SDL_GetTicks64();
-    test(block, threads, h_pixel, m_base->w, m_base->h);
+    CannyEdgeDetection(h_pixel, m_base->w, m_base->h);
     auto b = SDL_GetTicks64();
     printf("Time: %f\n", (b - a) * 0.0001);
     cudaMemcpy(m_base->pixels,
@@ -81,10 +75,6 @@ void DetectorCuda::DetectEdge() {
     VAO.AddElementBuffer(EBO);
 }
 void DetectorCuda::Display() {
-    glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
-    glViewport(0, 0, 1024, 720);
-    glCullFace(GL_BACK);
-    glClear(GL_COLOR_BUFFER_BIT);
     shaderProgram.Bind();
     VAO.Bind();
     glBindTexture(GL_TEXTURE_2D, tex);

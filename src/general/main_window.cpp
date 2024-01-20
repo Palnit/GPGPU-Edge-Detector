@@ -16,7 +16,7 @@
 #include <implot.h>
 
 int MainWindow::Init() {
-    SDL_Surface* m_base = FileHandling::LoadImage("pictures/d2.png");
+    SDL_Surface* m_base = FileHandling::LoadImage("pictures/img.jpg");
 
     m_det = new DetectorCuda(m_base);
     m_det->DetectEdge();
@@ -59,6 +59,10 @@ int MainWindow::Init() {
 }
 
 void MainWindow::Render() {
+    glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
+    glViewport(0, 0, m_width, m_height);
+    glCullFace(GL_BACK);
+    glClear(GL_COLOR_BUFFER_BIT);
     m_det->Display();
 }
 

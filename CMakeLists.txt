@@ -64,6 +64,7 @@ set(RESOURCES
         pictures/img.jpg
         pictures/test.jpg
         pictures/d2.png
+        pictures/d2_90.jpg
 
         shaders/default_fragment.frag
         shaders/default_vertex.vert
