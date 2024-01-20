@@ -3,7 +3,6 @@
 //
 
 #include "include/cuda/cuda_edge_detection.cuh"
-#include <cstdint>
 #include <cstdio>
 #include <math_constants.h>
 
@@ -28,26 +27,30 @@ __global__ void convertToGreyScale(uint8_t* asd, float* dest, int w, int h) {
 
 }
 
-__global__ void GetGaussian(float* kernel) {
+__global__ void GetGaussian(float* kernel, int kernelSize, float sigma) {
     uint32_t x = threadIdx.x;
     uint32_t y = threadIdx.y;
 
-    float xp = (((x + 1.f) - (1.f + 2.f)) * ((x + 1.f) - (1.f + 2.f)));
-    float yp = (((y + 1.f) - (1.f + 2.f)) * ((y + 1.f) - (1.f + 2.f)));
-    *(kernel + x + (y * 5)) =
-        (1.f / (2.f * CUDART_PI_F * 4.f)) * expf(-((xp + yp) / (2.f * 4.f)));
+    int k = (kernelSize - 1) / 2;
 
+    float xp = (((x + 1.f) - (1.f + k)) * ((x + 1.f) - (1.f + k)));
+    float yp = (((y + 1.f) - (1.f + k)) * ((y + 1.f) - (1.f + k)));
+    *(kernel + x + (y * kernelSize)) =
+        (1.f / (2.f * CUDART_PI_F * sigma * sigma))
+            * expf(-((xp + yp) / (2.f * sigma * sigma)));
 }
 
 __global__ void GaussianFilter(float* src,
                                float* dest,
                                float* gauss,
+                               int kernelSize,
                                int w,
                                int h) {
-    int col = blockIdx.x * (blockDim.x - 5 + 1) + threadIdx.x;
-    int row = blockIdx.y * (blockDim.y - 5 + 1) + threadIdx.y;
-    int col_i = col - 2;
-    int row_i = row - 2;
+    int col = blockIdx.x * (blockDim.x - kernelSize + 1) + threadIdx.x;
+    int row = blockIdx.y * (blockDim.y - kernelSize + 1) + threadIdx.y;
+    int k = (kernelSize - 1) / 2;
+    int col_i = col - k;
+    int row_i = row - k;
 
     __shared__ float src_shared[32][32];
 
@@ -60,12 +63,13 @@ __global__ void GaussianFilter(float* src,
     __syncthreads();
     float sum = 0;
 
-    if (threadIdx.x > 2 - 1 && threadIdx.y > 2 - 1 && threadIdx.x < 32 - 2
-        && threadIdx.y < 32 - 2 && col_i < w + 2 && row_i < h + 2) {
-        for (int i = -2; i < 3; i++) {
-            for (int j = -2; j < 3; j++) {
+    if (threadIdx.x > k - 1 && threadIdx.y > k - 1 && threadIdx.x < 32 - k
+        && threadIdx.y < 32 - k && col_i < w + k && row_i < h + k) {
+
+        for (int i = -k; i <= k; i++) {
+            for (int j = -k; j <= k; j++) {
                 sum += src_shared[threadIdx.x + i][threadIdx.y + j]
-                    * (*(gauss + (i + 2) + ((j + 2) * 5)));
+                    * (*(gauss + (i + k) + ((j + k) * kernelSize)));
             }
         }
         *(dest + col_i + (row_i * w)) = sum;
@@ -251,10 +255,12 @@ __global__ void CopyBack(uint8_t* src, float* dest, int w, int h) {
     }
     RGBA* color = (RGBA*) (src + (x * 4) + (y * w * 4));
     color->r = color->g = color->b = *(dest + x + (y * w));
+    if (x == 0 && y == 0) {
+    }
 
 }
 
-void CannyEdgeDetection(uint8_t* src, int w, int h) {
+void CudaDetector::CannyEdgeDetection() {
     float* dest1;
     float* dest2;
 
@@ -263,32 +269,38 @@ void CannyEdgeDetection(uint8_t* src, int w, int h) {
 
     dim3 threads(32, 32);
     dim3 block
-        (w / threads.x + (w % threads.x == 0 ? 0 : 1),
-         h / threads.y
-             + (h % threads.y == 0 ? 0 : 1));
+        (m_w / threads.x + (m_w % threads.x == 0 ? 0 : 1),
+         m_h / threads.y
+             + (m_h % threads.y == 0 ? 0 : 1));
 
     dim3 block2
-        ((w / (threads.x - 5 + 1)) + (w % (threads.x - 5 + 1) == 0 ? 0 : 1),
-         (h / (threads.y - 5 + 1))
-             + (h % (threads.y - 5 + 1) == 0 ? 0 : 1));
+        ((m_w / (threads.x - m_gaussKernelSize + 1))
+             + (m_w % (threads.x - m_gaussKernelSize + 1) == 0 ? 0 : 1),
+         (m_h / (threads.y - m_gaussKernelSize + 1))
+             + (m_h % (threads.y - m_gaussKernelSize + 1) == 0 ? 0 : 1));
     dim3 block3
-        ((w / (threads.x - 3 + 1)) + (w % (threads.x - 3 + 1) == 0 ? 0 : 1),
-         (h / (threads.y - 3 + 1))
-             + (h % (threads.y - 3 + 1) == 0 ? 0 : 1));
+        ((m_w / (threads.x - 3 + 1)) + (m_w % (threads.x - 3 + 1) == 0 ? 0 : 1),
+         (m_h / (threads.y - 3 + 1))
+             + (m_h % (threads.y - 3 + 1) == 0 ? 0 : 1));
 
     cudaMalloc((void**) &kernel, sizeof(float) * 25);
-    cudaMalloc((void**) &dest1, sizeof(float) * w * h);
-    cudaMalloc((void**) &dest2, sizeof(float) * w * h);
-    cudaMalloc((void**) &tangent, sizeof(float) * w * h);
-    dim3 gauss(5, 5);
-    convertToGreyScale<<<block, threads>>>(src, dest1, w, h);
-    GetGaussian<<<1, gauss>>>(kernel);
-    GaussianFilter<<<block2, threads>>>(dest1, dest2, kernel, w, h);
-    DetectionOperator<<<block3, threads>>>(dest2, dest1, tangent, w, h);
-    NonMaximumSuppression<<<block3, threads>>>(dest1, dest2, tangent, w, h);
-    DoubleThreshold<<<block, threads>>>(dest2, dest1, w, h, 150, 90);
-    Hysteresis<<<block3, threads>>>(dest1, dest2, w, h);
-    CopyBack<<<block, threads>>>(src, dest2, w, h);
+    cudaMalloc((void**) &dest1, sizeof(float) * m_w * m_h);
+    cudaMalloc((void**) &dest2, sizeof(float) * m_w * m_h);
+    cudaMalloc((void**) &tangent, sizeof(float) * m_w * m_h);
+    dim3 gauss(m_gaussKernelSize, m_gaussKernelSize);
+    convertToGreyScale<<<block, threads>>>(m_src, dest1, m_w, m_h);
+    GetGaussian<<<1, gauss>>>(kernel, m_gaussKernelSize, m_standardDeviation);
+    GaussianFilter<<<block2, threads>>>(dest1,
+                                        dest2,
+                                        kernel,
+                                        m_gaussKernelSize,
+                                        m_w,
+                                        m_h);
+    DetectionOperator<<<block3, threads>>>(dest2, dest1, tangent, m_w, m_h);
+    NonMaximumSuppression<<<block3, threads>>>(dest1, dest2, tangent, m_w, m_h);
+    DoubleThreshold<<<block, threads>>>(dest2, dest1, m_w, m_h, m_high, m_low);
+    Hysteresis<<<block3, threads>>>(dest1, dest2, m_w, m_h);
+    CopyBack<<<block, threads>>>(m_src, dest2, m_w, m_h);
     cudaFree(dest1);
     cudaFree(dest2);
     cudaFree(kernel);

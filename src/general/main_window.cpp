@@ -16,10 +16,6 @@
 #include <implot.h>
 
 int MainWindow::Init() {
-    SDL_Surface* m_base = FileHandling::LoadImage("pictures/img.jpg");
-
-    m_det = new DetectorCuda(m_base);
-    m_det->DetectEdge();
 
     uint8_t grey;
     RGBA* color;
@@ -63,11 +59,34 @@ void MainWindow::Render() {
     glViewport(0, 0, m_width, m_height);
     glCullFace(GL_BACK);
     glClear(GL_COLOR_BUFFER_BIT);
-    m_det->Display();
+    for (DetectorBase* detector : m_detectors) {
+        detector->Display();
+    }
 }
 
 void MainWindow::RenderImGui() {
     bool t = true;
     ImGui::ShowMetricsWindow(&t);
+    ImGui::ShowDemoWindow(&t);
+    m_display.DisplayImGui();
 
+}
+MainWindow::~MainWindow() {
+    for (DetectorBase* detector : m_detectors) {
+        free(detector);
+    }
+}
+void MainWindow::AddDetector(DetectorBase* Detector) {
+    m_detectors.push_back(Detector);
+}
+void MainWindow::RemoveDetector(DetectorBase* Detector) {
+    auto position = std::find(m_detectors.begin(), m_detectors.end(), Detector);
+    if (position != m_detectors.end()) {
+        free(*position);
+        m_detectors.erase(position);
+    }
+}
+void MainWindow::Resize() {
+    BasicWindow::Resize();
+    m_display.Resize(m_width, m_height);
 }

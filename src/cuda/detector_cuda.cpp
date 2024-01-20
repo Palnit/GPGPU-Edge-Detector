@@ -8,6 +8,8 @@
 #include "include/general/OpenGL_SDL/basic_window.h"
 #include "include/general/OpenGL_SDL/file_handling.h"
 
+#include <cuda_runtime.h>
+
 void DetectorCuda::DetectEdge() {
     uint8_t* h_pixel = nullptr;
 
@@ -23,33 +25,62 @@ void DetectorCuda::DetectEdge() {
                cudaMemcpyHostToDevice);
 
     auto a = SDL_GetTicks64();
-    CannyEdgeDetection(h_pixel, m_base->w, m_base->h);
+    CudaDetector(h_pixel,
+                 m_base->w,
+                 m_base->h,
+                 m_gaussKernelSize,
+                 m_standardDeviation,
+                 m_highTrashHold,
+                 m_lowTrashHold);
     auto b = SDL_GetTicks64();
     printf("Time: %f\n", (b - a) * 0.0001);
-    cudaMemcpy(m_base->pixels,
+    cudaMemcpy(m_detected->pixels,
                h_pixel,
-               sizeof(uint8_t) * m_base->w * m_base->h
-                   * m_base->format->BytesPerPixel,
+               sizeof(uint8_t) * m_detected->w * m_detected->h
+                   * m_detected->format->BytesPerPixel,
                cudaMemcpyDeviceToHost);
 
     cudaFree(h_pixel);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexImage2D(GL_TEXTURE_2D,
+                 0,
+                 GL_RGBA,
+                 m_detected->w,
+                 m_detected->h,
+                 0,
+                 GL_RGBA,
+                 GL_UNSIGNED_BYTE,
+                 m_detected->pixels);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+}
+void DetectorCuda::Display() {
+    shaderProgram.Bind();
+    VAO.Bind();
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    VAO.UnBind();
+    shaderProgram.UnBind();
+}
+DetectorCuda::DetectorCuda(SDL_Surface* base, std::string name) : DetectorBase(
+    base,
+    std::move(name)) {
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
     glTexImage2D(GL_TEXTURE_2D,
                  0,
                  GL_RGBA,
-                 m_base->w,
-                 m_base->h,
+                 m_detected->w,
+                 m_detected->h,
                  0,
                  GL_RGBA,
                  GL_UNSIGNED_BYTE,
-                 m_base->pixels);
+                 m_detected->pixels);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    SDL_FreeSurface(m_base);
-
     float verts[] = {
         -1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
         -1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
@@ -74,14 +105,31 @@ void DetectorCuda::DetectEdge() {
     VAO.AddVertexBuffer(VBO);
     VAO.AddElementBuffer(EBO);
 }
-void DetectorCuda::Display() {
-    shaderProgram.Bind();
-    VAO.Bind();
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    VAO.UnBind();
-    shaderProgram.UnBind();
-}
-void DetectorCuda::GetTime() {
+void DetectorCuda::DisplayImGui() {
+    if (ImGui::BeginTabItem(m_name.c_str())) {
 
+        if (ImGui::SliderInt("Gauss Kernel Size", &m_gaussKernelSize, 3, 7)) {
+            if (m_gaussKernelSize % 2 == 0) {
+                m_gaussKernelSize++;
+            }
+        }
+        ImGui::SetItemTooltip("Only Odd Numbers");
+        ImGui::SliderFloat("Standard Deviation",
+                           &m_standardDeviation,
+                           1.0f,
+                           10.0f);
+        ImGui::SliderFloat("High Trash Hold",
+                           &m_highTrashHold,
+                           1.0f,
+                           255.0f);
+        ImGui::SliderFloat("Low Trash Hold",
+                           &m_lowTrashHold,
+                           1.0f,
+                           255.0f);
+        ImGui::Separator();
+        if (ImGui::Button("Detect")) {
+            DetectEdge();
+        }
+        ImGui::EndTabItem();
+    }
 }

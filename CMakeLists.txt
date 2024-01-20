@@ -33,6 +33,8 @@ set(HEADER_FILES
         include/general/OpenGL_SDL/vertex_array_object.h
         include/general/OpenGL_SDL/element_buffer_object.h
         include/general/OpenGL_SDL/shader_program.h
+        include/cuda/detector_cuda.h
+        include/general/imgui_display.h
 )
 
 set(SOURCE_FILES
@@ -48,16 +50,16 @@ set(SOURCE_FILES
         src/general/OpenGL_SDL/vertex_array_object.cpp
         src/general/OpenGL_SDL/element_buffer_object.cpp
         src/general/OpenGL_SDL/shader_program.cpp
+        src/cuda/detector_cuda.cpp
+        src/general/imgui_display.cpp
 )
 
 set(CUDA_HEADER_FILES
         include/cuda/cuda_edge_detection.cuh
-        include/cuda/detector_cuda.h
 )
 
 set(CUDA_SOURCE_FILES
         src/cuda/cuda_edge_detection.cu
-        src/cuda/detector_cuda.cpp
 )
 
 set(RESOURCES
@@ -65,6 +67,7 @@ set(RESOURCES
         pictures/test.jpg
         pictures/d2.png
         pictures/d2_90.jpg
+        pictures/github.PNG
 
         shaders/default_fragment.frag
         shaders/default_vertex.vert
@@ -88,16 +91,6 @@ target_compile_features(cuda_comp PRIVATE
         cuda_std_17
 )
 
-target_link_libraries(cuda_comp PRIVATE
-        $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
-        $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
-        $<IF:$<TARGET_EXISTS:SDL2_image::SDL2_image>,SDL2_image::SDL2_image,SDL2_image::SDL2_image-static>
-        imgui::imgui
-        GLEW::GLEW
-        glm::glm
-        OpenGL::GL
-        implot::implot
-)
 
 set_target_properties(cuda_comp
         PROPERTIES
