@@ -30,7 +30,6 @@ private:
     BasicWindow* m_parent;
     int m_width;
     int m_height;
-    bool m_open = true;
     int m_add = 0;
     int m_remove = 0;
     int m_picture = 0;

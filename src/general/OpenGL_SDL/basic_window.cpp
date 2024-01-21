@@ -86,32 +86,30 @@ int BasicWindow::run() {
                     }
                     break;
             }
-
-            Time::DeltaTime = SDL_GetTicks64() - Time::ElapsedTime;
-            Time::ElapsedTime = SDL_GetTicks64();
-            double diff = (Time::ElapsedTime - fpsLastTime) * 0.001;
-            fpsCount++;
-            if (diff >= 1.0 / 30.0) {
-                Time::FPS = (1.0 / diff) * fpsCount;
-                Time::Ms = (diff / fpsCount) * 1000;
-                fpsLastTime = Time::ElapsedTime;
-                fpsCount = 0;
-            }
-
-            Update();
-            Render();
-
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplSDL2_NewFrame();
-
-            ImGui::NewFrame();
-
-            RenderImGui();
-
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-            SDL_GL_SwapWindow(m_window);
         }
+        Time::DeltaTime = SDL_GetTicks64() - Time::ElapsedTime;
+        Time::ElapsedTime = SDL_GetTicks64();
+        double diff = (Time::ElapsedTime - fpsLastTime) * 0.001;
+        fpsCount++;
+        if (diff >= 1.0 / 30.0) {
+            Time::FPS = (1.0 / diff) * fpsCount;
+            Time::Ms = (diff / fpsCount) * 1000;
+            fpsLastTime = Time::ElapsedTime;
+            fpsCount = 0;
+        }
+        Update();
+        Render();
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+
+        ImGui::NewFrame();
+
+        RenderImGui();
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        SDL_GL_SwapWindow(m_window);
     }
     return 0;
 }

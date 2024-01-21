@@ -14,18 +14,7 @@
 
 class DetectorBase {
 public:
-    DetectorBase(SDL_Surface* picture, std::string name)
-        : m_base(picture), m_name(std::move(name)) {
-        m_detected = SDL_CreateRGBSurface(0,
-                                          m_base->w,
-                                          m_base->h,
-                                          m_base->format->BitsPerPixel,
-                                          m_base->format->Rmask,
-                                          m_base->format->Gmask,
-                                          m_base->format->Bmask,
-                                          m_base->format->Amask);
-        SDL_BlitSurface(m_base, NULL, m_detected, NULL);
-    }
+    DetectorBase(SDL_Surface* picture, std::string name);
     ~DetectorBase() {
         SDL_FreeSurface(m_base);
         SDL_FreeSurface(m_detected);

@@ -3,10 +3,8 @@
 //
 
 #include "include/general//main_window.h"
-#include "include/cuda/cuda_edge_detection.cuh"
 #include "include/general/detector_base.h"
 #include "include/general/OpenGL_SDL/file_handling.h"
-#include "include/cuda/detector_cuda.h"
 #include "include/general/OpenGL_SDL/generic_structs.h"
 
 #include <ctime>

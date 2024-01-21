@@ -9,11 +9,6 @@ FetchContent_MakeAvailable(vcpkg)
 set(CMAKE_TOOLCHAIN_FILE "${vcpkg_SOURCE_DIR}/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "")
 set(VCPKG_TRACE_FIND_PACKAGE true)
 
-
-#if (NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
-#    set(CMAKE_CUDA_ARCHITECTURES 86)
-#endif ()
-
 project(GPGPU_Edge_Detector
         VERSION 0.1
         LANGUAGES CUDA CXX)
@@ -23,7 +18,6 @@ set(CMAKE_CUDA_STANDARD 17)
 
 set(HEADER_FILES
         include/general/OpenGL_SDL/basic_window.h
-        include/cuda/gpu_info.h
         include/general/OpenGL_SDL/SDL_GLDebugMessageCallback.h
         include/general/main_window.h
         include/general/detector_base.h
@@ -33,13 +27,16 @@ set(HEADER_FILES
         include/general/OpenGL_SDL/vertex_array_object.h
         include/general/OpenGL_SDL/element_buffer_object.h
         include/general/OpenGL_SDL/shader_program.h
-        include/cuda/detector_cuda.h
         include/general/imgui_display.h
+        include/Canny/cuda/canny_edge_detector_cuda.h
+        include/Canny/canny_timings.h
+        include/general/cuda/gpu_info.h
+        include/Dog/cuda/dog_edge_detector_cuda.h
+        include/Dog/dog_timings.h
 )
 
 set(SOURCE_FILES
         src/main.cpp
-        src/cuda/gpu_info.cpp
         src/general/OpenGL_SDL/basic_window.cpp
         src/general/OpenGL_SDL/SDL_GLDebugMessageCallback.cpp
         src/general/main_window.cpp
@@ -50,16 +47,22 @@ set(SOURCE_FILES
         src/general/OpenGL_SDL/vertex_array_object.cpp
         src/general/OpenGL_SDL/element_buffer_object.cpp
         src/general/OpenGL_SDL/shader_program.cpp
-        src/cuda/detector_cuda.cpp
         src/general/imgui_display.cpp
+        src/Canny/cuda/canny_edge_detector_cuda.cpp
+        src/general/cuda/gpu_info.cpp
+        src/Dog/cuda/dog_edge_detector_cuda.cpp
 )
 
 set(CUDA_HEADER_FILES
-        include/cuda/cuda_edge_detection.cuh
+        include/Canny/cuda/cuda_canny_edge_detection.cuh
+        include/general/cuda/gauss_blur.cuh
+        include/Dog/cuda/cuda_dog_edge_detection.cuh
 )
 
 set(CUDA_SOURCE_FILES
-        src/cuda/cuda_edge_detection.cu
+        src/Canny/cuda/cuda_canny_edge_detection.cu
+        src/general/cuda/gauss_blur.cu
+        src/Dog/cuda/cuda_dog_edge_detection.cu
 )
 
 set(RESOURCES
@@ -95,8 +98,8 @@ target_compile_features(cuda_comp PRIVATE
 set_target_properties(cuda_comp
         PROPERTIES
         CUDA_RUNTIME_LIBRARY Shared
-        CUDA_STANDARD 17 # this one cannot be changed by CMake
-        CUDA_SEPARABLE_COMPILATION ON # not needed for this example
+        CUDA_STANDARD 17
+        CUDA_SEPARABLE_COMPILATION OFF
 )
 
 add_executable(${CMAKE_PROJECT_NAME}

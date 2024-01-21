@@ -6,7 +6,7 @@
 #define GPGPU_EDGE_DETECTOR_INCLUDE_MAIN_WINDOW_H_
 #include "include/general/OpenGL_SDL/basic_window.h"
 #include "include/general/detector_base.h"
-#include "include/cuda/detector_cuda.h"
+#include "include/Canny/cuda/canny_edge_detector_cuda.h"
 #include "include/general/OpenGL_SDL/file_handling.h"
 #include "imgui_display.h"
 
@@ -35,7 +35,7 @@ public:
     void Resize() override;
 private:
     std::vector<DetectorBase*> m_detectors;
-    DetectorCuda* m_det;
+    CannyEdgeDetectorCuda* m_det;
     ImGuiDisplay m_display;
 
 };

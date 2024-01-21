@@ -4,13 +4,14 @@
 
 #include "include/general/imgui_display.h"
 #include "include/general/main_window.h"
+#include "include/Dog/cuda/dog_edge_detector_cuda.h"
 #include <imgui.h>
 
 void ImGuiDisplay::DisplayImGui() {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2(m_width / 3, m_height));
     if (!ImGui::Begin("Edge Detector Options",
-                      &m_open,
+                      NULL,
                       ImGuiWindowFlags_NoMove
                           | ImGuiWindowFlags_NoDocking
                           | ImGuiWindowFlags_NoResize)) {
@@ -37,7 +38,24 @@ void ImGuiDisplay::DisplayImGui() {
         std::string file = "pictures/" + m_pictures.at(m_picture);
         SDL_Surface* m_base = FileHandling::LoadImage(file.c_str());
 
-        m_detectors.push_back(new DetectorCuda(m_base, m_buf));
+        DetectorBase* detector;
+
+        switch (m_add) {
+            case 0:
+                detector = new CannyEdgeDetectorCuda(m_base, m_buf);
+                break;
+            case 1:
+                detector = new CannyEdgeDetectorCuda(m_base, m_buf);
+                break;
+            case 2:
+                detector = new CannyEdgeDetectorCuda(m_base, m_buf);
+                break;
+            case 3:
+                detector = new DogEdgeDetectorCuda(m_base, m_buf);
+                break;
+        }
+
+        m_detectors.push_back(detector);
         parent->AddDetector(m_detectors.back());
         m_names.emplace_back(m_buf);
     }

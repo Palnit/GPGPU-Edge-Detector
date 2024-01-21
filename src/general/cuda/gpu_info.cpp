@@ -2,7 +2,7 @@
 // Created by Palnit on 2023. 11. 11.
 //
 
-#include "include/cuda/gpu_info.h"
+#include "include/general/cuda/gpu_info.h"
 
 #include <cuda_runtime.h>
 #include <cuda.h>
