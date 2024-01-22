@@ -34,7 +34,7 @@ __global__ void DetectionOperator(float* src,
     float SumY = 0;
 
     if (threadIdx.x > 1 - 1 && threadIdx.y > 1 - 1 && threadIdx.x < 32 - 1
-        && threadIdx.y < 32 - 1 && col_i < w + 1 && row_i < h + 1) {
+        && threadIdx.y < 32 - 1 && col_i < w && row_i < h) {
         for (int i = -1; i < 2; i++) {
             for (int j = -1; j < 2; j++) {
                 SumX += src_shared[threadIdx.x + i][threadIdx.y + j]
@@ -76,7 +76,7 @@ __global__ void NonMaximumSuppression(float* gradient_in,
     __syncthreads();
 
     if (threadIdx.x <= 1 - 1 || threadIdx.y <= 1 - 1 || threadIdx.x >= 32 - 1
-        || threadIdx.y >= 32 - 1 || col_i >= w + 1 || row_i >= h + 1) {
+        || threadIdx.y >= 32 - 1 || col_i >= w || row_i >= h) {
         return;
     }
 
@@ -150,7 +150,7 @@ __global__ void Hysteresis(float* gradient_in,
     __syncthreads();
 
     if (threadIdx.x <= 1 - 1 || threadIdx.y <= 1 - 1 || threadIdx.x >= 32 - 1
-        || threadIdx.y >= 32 - 1 || col_i >= w + 1 || row_i >= h + 1) {
+        || threadIdx.y >= 32 - 1 || col_i >= w || row_i >= h) {
         return;
     }
 

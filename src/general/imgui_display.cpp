@@ -5,6 +5,7 @@
 #include "include/general/imgui_display.h"
 #include "include/general/main_window.h"
 #include "include/Dog/cuda/dog_edge_detector_cuda.h"
+#include "include/Canny/cpu/canny_edge_detector_cpu.h"
 #include <imgui.h>
 
 void ImGuiDisplay::DisplayImGui() {
@@ -42,7 +43,7 @@ void ImGuiDisplay::DisplayImGui() {
 
         switch (m_add) {
             case 0:
-                detector = new CannyEdgeDetectorCuda(m_base, m_buf);
+                detector = new CannyEdgeDetectorCPU(m_base, m_buf);
                 break;
             case 1:
                 detector = new CannyEdgeDetectorCuda(m_base, m_buf);
