@@ -6,6 +6,7 @@
 #include "include/Dog/cuda/dog_edge_detector_cuda.h"
 #include "imgui.h"
 #include "include/Dog/cuda/cuda_dog_edge_detection.cuh"
+#include "SDL_image.h"
 void DogEdgeDetectorCuda::DetectEdge() {
     uint8_t* d_pixel = nullptr;
 
@@ -92,6 +93,11 @@ void DogEdgeDetectorCuda::DisplayImGui() {
         if (!m_timingsReady) {
             ImGui::EndTabItem();
             return;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Save")) {
+            std::string save_path = "./" + m_name + ".png";
+            IMG_SavePNG(m_detected, save_path.c_str());
         }
 
         ImGui::Separator();

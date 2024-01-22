@@ -5,14 +5,14 @@
 #include "include/general/cuda/gauss_blur.cuh"
 #include <math_constants.h>
 
-__global__ void convertToGreyScale(uint8_t* asd, float* dest, int w, int h) {
+__global__ void convertToGreyScale(uint8_t* base, float* dest, int w, int h) {
     uint32_t x = blockIdx.x * blockDim.x + threadIdx.x;
     uint32_t y = blockIdx.y * blockDim.y + threadIdx.y;
     if (x >= w || y >= h) {
         return;
     }
 
-    RGBA* color = (RGBA*) (asd + (x * 4) + (y * w * 4));
+    RGBA* color = (RGBA*) (base + (x * 4) + (y * w * 4));
     *(dest + x + (y * w)) = 0.299 * color->r
         + 0.587 * color->g
         + 0.114 * color->b;
@@ -28,8 +28,8 @@ __global__ void GetGaussian(float* kernel, int kernelSize, float sigma) {
     float xp = (((x + 1.f) - (1.f + k)) * ((x + 1.f) - (1.f + k)));
     float yp = (((y + 1.f) - (1.f + k)) * ((y + 1.f) - (1.f + k)));
     *(kernel + x + (y * kernelSize)) =
-        (1.f / (2.f * CUDART_PI_F * sigma * sigma))
-            * expf(-((xp + yp) / (2.f * sigma * sigma)));
+        (1.f / (2.f * CUDART_PI * sigma * sigma))
+            * exp(-((xp + yp) / (2.f * sigma * sigma)));
     __syncthreads();
     __shared__ float sum;
     if (x == 0 && y == 0) {
@@ -70,7 +70,7 @@ __global__ void GaussianFilter(float* src,
     float sum = 0;
 
     if (threadIdx.x > k - 1 && threadIdx.y > k - 1 && threadIdx.x < 32 - k
-        && threadIdx.y < 32 - k && col_i < w + k && row_i < h + k) {
+        && threadIdx.y < 32 - k && col_i < w && row_i < h) {
 
         for (int i = -k; i <= k; i++) {
             for (int j = -k; j <= k; j++) {

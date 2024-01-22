@@ -93,6 +93,11 @@ void CannyEdgeDetectorCuda::DisplayImGui() {
             ImGui::EndTabItem();
             return;
         }
+        ImGui::SameLine();
+        if (ImGui::Button("Save")) {
+            std::string save_path = "./" + m_name + ".png";
+            IMG_SavePNG(m_detected, save_path.c_str());
+        }
 
         ImGui::Separator();
         ImGui::TextColored(ImVec4(1, 0, 0, 1), "CannyTimings:");

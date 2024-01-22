@@ -33,6 +33,8 @@ set(HEADER_FILES
         include/general/cuda/gpu_info.h
         include/Dog/cuda/dog_edge_detector_cuda.h
         include/Dog/dog_timings.h
+        include/Canny/cpu/canny_edge_detector_cpu.h
+        include/general/cpu/gauss_blur_cpu.h
 )
 
 set(SOURCE_FILES
@@ -51,6 +53,10 @@ set(SOURCE_FILES
         src/Canny/cuda/canny_edge_detector_cuda.cpp
         src/general/cuda/gpu_info.cpp
         src/Dog/cuda/dog_edge_detector_cuda.cpp
+        src/Canny/cpu/canny_edge_detector_cpu.cpp
+        src/general/cpu/gauss_blur_cpu.cpp
+        src/Dog/cpu/dog_edge_detector_cpu.cpp
+        include/Dog/cpu/dog_edge_detector_cpu.h
 )
 
 set(CUDA_HEADER_FILES
