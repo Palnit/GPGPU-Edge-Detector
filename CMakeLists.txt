@@ -55,6 +55,8 @@ set(SOURCE_FILES
         src/Dog/cuda/dog_edge_detector_cuda.cpp
         src/Canny/cpu/canny_edge_detector_cpu.cpp
         src/general/cpu/gauss_blur_cpu.cpp
+        src/Dog/cpu/dog_edge_detector_cpu.cpp
+        include/Dog/cpu/dog_edge_detector_cpu.h
 )
 
 set(CUDA_HEADER_FILES
