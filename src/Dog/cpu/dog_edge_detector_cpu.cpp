@@ -6,6 +6,7 @@
 #include "include/Dog/cpu/dog_edge_detector_cpu.h"
 #include "imgui.h"
 #include "include/general/cpu/gauss_blur_cpu.h"
+#include "SDL_image.h"
 
 void DogEdgeDetectorCPU::DetectEdge() {
     m_pixels1 =
@@ -122,6 +123,11 @@ void DogEdgeDetectorCPU::DisplayImGui() {
         if (!m_timingsReady) {
             ImGui::EndTabItem();
             return;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Save")) {
+            std::string save_path = "./" + m_name + ".png";
+            IMG_SavePNG(m_detected, save_path.c_str());
         }
 
         ImGui::Separator();

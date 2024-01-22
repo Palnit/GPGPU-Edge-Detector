@@ -29,7 +29,7 @@ __global__ void GetGaussian(float* kernel, int kernelSize, float sigma) {
     float yp = (((y + 1.f) - (1.f + k)) * ((y + 1.f) - (1.f + k)));
     *(kernel + x + (y * kernelSize)) =
         (1.f / (2.f * CUDART_PI * sigma * sigma))
-            * expf(-((xp + yp) / (2.f * sigma * sigma)));
+            * exp(-((xp + yp) / (2.f * sigma * sigma)));
     __syncthreads();
     __shared__ float sum;
     if (x == 0 && y == 0) {

@@ -7,6 +7,7 @@
 #include "include/general/OpenGL_SDL/generic_structs.h"
 #include "include/general/cpu/gauss_blur_cpu.h"
 #include "chrono"
+#include "SDL_image.h"
 
 void CannyEdgeDetectorCPU::DetectEdge() {
     m_pixels1 =
@@ -130,7 +131,11 @@ void CannyEdgeDetectorCPU::DisplayImGui() {
             ImGui::EndTabItem();
             return;
         }
-
+        ImGui::SameLine();
+        if (ImGui::Button("Save")) {
+            std::string save_path = "./" + m_name + ".png";
+            IMG_SavePNG(m_detected, save_path.c_str());
+        }
         ImGui::Separator();
         ImGui::TextColored(ImVec4(1, 0, 0, 1), "CannyTimings:");
         ImGui::Text("Whole execution:         %f ms", m_timings.All_ms);
