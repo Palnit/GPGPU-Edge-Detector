@@ -4,6 +4,7 @@
 
 #include "include/general/detector_base.h"
 #include "include/general/OpenGL_SDL/file_handling.h"
+
 DetectorBase::DetectorBase(SDL_Surface* picture, std::string name)
     : m_base(picture), m_name(std::move(name)) {
     m_detected = SDL_CreateRGBSurface(0,

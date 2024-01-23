@@ -7,6 +7,7 @@
 
 #include "include/general/detector_base.h"
 #include "include/Dog/dog_timings.h"
+
 class DogEdgeDetectorCuda : public DetectorBase {
 public:
     DogEdgeDetectorCuda(SDL_Surface* base,

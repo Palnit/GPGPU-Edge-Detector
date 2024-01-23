@@ -19,6 +19,7 @@ void GaussianFilter(float* img,
                     int kernelSize,
                     int w,
                     int h);
+
 template<typename F, typename ... Args>
 float TimerRunner(F&& func, Args&& ... args) {
     auto t1 = std::chrono::high_resolution_clock::now();

@@ -5,20 +5,21 @@
 #ifndef BASIC_WINDOW_H_
 #define BASIC_WINDOW_H_
 
-#include "vcpkg_installed/x64-windows/include/SDL2/SDL.h"
-#include "vcpkg_installed/x64-windows/include/SDL2/SDL_image.h"
-#include "vcpkg_installed/x64-windows/include/SDL2/SDL_rwops.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_rwops.h>
 
-#include "vcpkg_installed/x64-windows/include/GL/glew.h"
+#include <GL/glew.h>
 
-#include "vcpkg_installed/x64-windows/include/glm/glm.hpp"
+#include <glm/glm.hpp>
 
-#include "vcpkg_installed/x64-windows/include/imgui.h"
-#include "vcpkg_installed/x64-windows/include/implot.h"
+#include <imgui.h>
+#include <implot.h>
 
 /*!
  * \class BasicWindow
  * \brief An SDL2-Opengl-ImGui window generating virtual class should be inherited
+ *
  * Creates and checks for errors during window and opengl context creation its a
  * its a class that's designed to be inherited from to completely abstract the sdl2
  * - opengl - ImGui window creation boiler plate and provide easy access to it's

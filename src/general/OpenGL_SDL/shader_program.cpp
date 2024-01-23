@@ -3,6 +3,7 @@
 //
 
 #include "include/general/OpenGL_SDL/shader_program.h"
+
 ShaderProgram::ShaderProgram() {
     m_program = glCreateProgram();
 }
@@ -25,13 +26,11 @@ void ShaderProgram::LinkProgram() {
     }
     linked = true;
     glLinkProgram(m_program);
-    for (auto shader : m_shaders) {
-        glDeleteShader(shader);
-    }
 }
 ShaderProgram::~ShaderProgram() {
     for (auto shader : m_shaders) {
         glDetachShader(m_program, shader);
+        glDeleteShader(shader);
     }
     glDeleteProgram(m_program);
 }

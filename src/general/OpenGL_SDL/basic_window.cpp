@@ -6,16 +6,15 @@
 #include "include/general/OpenGL_SDL/SDL_GLDebugMessageCallback.h"
 #include "include/general/OpenGL_SDL/generic_structs.h"
 
-#include "vcpkg_installed/x64-windows/include/SDL2/SDL.h"
-#include "vcpkg_installed/x64-windows/include/SDL2/SDL_image.h"
-#include "vcpkg_installed/x64-windows/include/SDL2/SDL_rwops.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
-#include "vcpkg_installed/x64-windows/include/GL/glew.h"
+#include <GL/glew.h>
 
-#include "vcpkg_installed/x64-windows/include/imgui.h"
-#include "vcpkg_installed/x64-windows/include/imgui_impl_sdl2.h"
-#include "vcpkg_installed/x64-windows/include/imgui_impl_opengl3.h"
-#include "vcpkg_installed/x64-windows/include/implot.h"
+#include <imgui.h>
+#include <imgui_impl_sdl2.h>
+#include <imgui_impl_opengl3.h>
+#include <implot.h>
 
 BasicWindow::BasicWindow(const char* title,
                          int x,

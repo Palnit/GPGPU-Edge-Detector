@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vcpkg_installed/x64-windows/include/GL/glew.h"
+#include <GL/glew.h>
 
 void GLAPIENTRY SDL_GLDebugMessageCallback(GLenum source,
                                            GLenum type,
