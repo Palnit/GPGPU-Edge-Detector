@@ -8,14 +8,44 @@
 #include "GL/glew.h"
 #include <vector>
 
+/*!
+ * \class ShaderProgram
+ * \brief An abstraction class for OpenGl-s shader programs
+ *
+ * It can take different kinds of shaders to link them and latter when needed
+ * bind the program
+ */
 class ShaderProgram {
 public:
+    /*!
+     * Default constructor generates the OpenGl program
+     */
     ShaderProgram();
+
+    /*!
+     * Default destructor deletes the OpenGl program
+     */
     ~ShaderProgram();
+
+    /*!
+     * Attaches a shader to the program
+     * \param shader The id of the shader to be attached
+     */
     void AttachShader(GLuint shader);
+
+    /*!
+     * Links the shader program
+     */
     void LinkProgram();
 
+    /*!
+     * Binds the shader program
+     */
     void Bind();
+
+    /*!
+     * UnBinds the shader program
+     */
     void UnBind();
 private:
     GLuint m_program;

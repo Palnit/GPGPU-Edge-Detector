@@ -37,10 +37,12 @@ __global__ void DetectionOperator(float* src,
         && threadIdx.y < 32 - 1 && col_i < w && row_i < h) {
         for (int i = -1; i < 2; i++) {
             for (int j = -1; j < 2; j++) {
-                SumX += src_shared[threadIdx.x + i][threadIdx.y + j]
-                    * (*(SobelX + (i + 1) + ((j + 1) * 3)));
-                SumY += src_shared[threadIdx.x + i][threadIdx.y + j]
-                    * (*(SobelY + (i + 1) + ((j + 1) * 3)));
+                SumX = fmaf(src_shared[threadIdx.x + i][threadIdx.y + j],
+                            (*(SobelX + (i + 1) + ((j + 1) * 3))),
+                            SumX);
+                SumY = fmaf(src_shared[threadIdx.x + i][threadIdx.y + j],
+                            (*(SobelY + (i + 1) + ((j + 1) * 3))),
+                            SumY);
             }
         }
         *(gradient + col_i + (row_i * w)) = hypotf(SumX, SumY);

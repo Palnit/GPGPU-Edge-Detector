@@ -77,6 +77,7 @@ set(RESOURCES
         pictures/d2.png
         pictures/d2_90.jpg
         pictures/github.PNG
+        pictures/d4.gif
 
         shaders/default_fragment.frag
         shaders/default_vertex.vert

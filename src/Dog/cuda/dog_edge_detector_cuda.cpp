@@ -7,6 +7,7 @@
 #include "imgui.h"
 #include "include/Dog/cuda/cuda_dog_edge_detection.cuh"
 #include "SDL_image.h"
+
 void DogEdgeDetectorCuda::DetectEdge() {
     uint8_t* d_pixel = nullptr;
 

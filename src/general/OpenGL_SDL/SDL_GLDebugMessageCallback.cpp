@@ -45,7 +45,7 @@
 
 #include "include/general/OpenGL_SDL/SDL_GLDebugMessageCallback.h"
 
-#include "vcpkg_installed/x64-windows/include/SDL2/SDL_log.h"
+#include <SDL2/SDL_log.h>
 
 // Callback function for printing debug statements
 void GLAPIENTRY SDL_GLDebugMessageCallback(GLenum source,

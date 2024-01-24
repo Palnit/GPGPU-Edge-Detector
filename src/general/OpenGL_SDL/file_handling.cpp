@@ -7,7 +7,7 @@
 #include <sstream>
 #include <iostream>
 #include "include/general/OpenGL_SDL/file_handling.h"
-#include "vcpkg_installed/x64-windows/include/SDL2/SDL_image.h"
+#include <SDL2/SDL_image.h>
 
 SDL_Surface* FileHandling::LoadImage(const char* file) {
     SDL_Surface* LoadedImg = IMG_Load(file);

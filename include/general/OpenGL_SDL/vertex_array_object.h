@@ -8,15 +8,39 @@
 #include "GL/glew.h"
 #include "vertex_buffer_object.h"
 #include "element_buffer_object.h"
+
+/*!
+ * \class VertexArrayObject
+ * \brief An abstraction class for the OpenGl vertex arrays
+ *
+ * It takes a VertexBufferObject class and an ElementBufferObject and takes
+ * makes the OpenGl vertex attributes from the VBO and binds the EBO to it self
+ */
 class VertexArrayObject {
 public:
+
+    /*!
+     * Constructor that generates the vertex arrays
+     */
     VertexArrayObject() : m_count(0) {
         glGenVertexArrays(1, &m_VAO);
     }
 
+    /*!
+     * Binds the vertex array
+     */
     void Bind() const;
+
+    /*!
+     * UnBinds the vertex array
+     */
     void UnBind() const;
 
+    /*!
+     * Function to add a vertex buffer to the array and gets the attribute pointers
+     * \tparam T The template type of the vertex buffer
+     * \param VBO The Vbo to be added
+     */
     template<typename T>
     void AddVertexBuffer(VertexBufferObject<T> VBO) {
         Bind();
@@ -34,6 +58,11 @@ public:
         VBO.UnBind();
         UnBind();
     }
+
+    /*!
+     * Adds an element buffer to the vertex array
+     * \param EBO
+     */
     void AddElementBuffer(ElementBufferObject EBO) {
         Bind();
         EBO.Bind();

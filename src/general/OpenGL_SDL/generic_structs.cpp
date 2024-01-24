@@ -4,7 +4,7 @@
 
 #include "include/general/OpenGL_SDL/generic_structs.h"
 
-#include "vcpkg_installed/x64-windows/include/SDL2/SDL.h"
+#include <SDL2/SDL.h>
 
 void ErrorHandling::HandelSDLError(const char* type) {
     SDL_LogError(SDL_LOG_CATEGORY_ERROR,
