@@ -5,6 +5,9 @@
 #ifndef GPGPU_EDGE_DETECTOR_INCLUDE_CUDA_CANNY_TIMINGS_H_
 #define GPGPU_EDGE_DETECTOR_INCLUDE_CUDA_CANNY_TIMINGS_H_
 
+/*!
+ * Simple struct containing timings for the Canny Edge detectors
+ */
 struct CannyTimings {
     float GrayScale_ms;
     float GaussCreation_ms;

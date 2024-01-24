@@ -9,13 +9,86 @@
 #include <cuda_runtime.h>
 #include "include/Canny/canny_timings.h"
 
-__global__ void DetectionOperator(float*, float*, float*, int, int);
-__global__ void NonMaximumSuppression(float*, float*, float*, int, int);
-__global__ void DoubleThreshold(float*, float*, int, int, float, float);
-__global__ void Hysteresis(float*, float*, int, int);
+/*!
+ * This function uses the sobel operator to calculate the gradient and the
+ * tangent for every pixel of the image
+ * \param src The source grey scaled image
+ * \param gradient The output gradient
+ * \param tangent The output tangent
+ * \param w The width of the image
+ * \param h The height of the image
+ */
+__global__ void DetectionOperator(float* src,
+                                  float* gradient,
+                                  float* tangent,
+                                  int w,
+                                  int h);
 
+/*!
+ * This function keeps the current pixel value if it's the maximum gradient in
+ * the tangent direction
+ * \param gradient_in The input gradient
+ * \param gradient_out The output gradient
+ * \param tangent The input's tangent
+ * \param w The width of the image
+ * \param h The height of the image
+ */
+__global__ void NonMaximumSuppression(float* gradient_in,
+                                      float* gradient_out,
+                                      float* tangent,
+                                      int w,
+                                      int h);
+
+/*!
+ * This function defines strong and week edges based on 2 arbitrary thresholds
+ * \param gradient_in The input gradient
+ * \param gradient_out The output gradient
+ * \param w The width of the image
+ * \param h The height of the image
+ * \param high The high threshold
+ * \param low The low threshold
+ */
+__global__ void DoubleThreshold(float* gradient_in,
+                                float* gradient_out,
+                                int w,
+                                int h,
+                                float high,
+                                float low);
+
+/*!
+ * This function keeps the week edges if they have at least one strong edge
+ * adjacent to them
+ * \param gradient_in The input gradient
+ * \param gradient_out The output gradient
+ * \param high The high threshold
+ * \param low The low threshold
+ */
+__global__ void Hysteresis(float* gradient_in,
+                           float* gradient_out,
+                           int w,
+                           int h);
+
+/*!
+ * \class CudaDogDetector
+ * \brief A utility class to temporarily store the data related to the algorithm
+ *
+ * This class simply exist so that the memory allocation on the cuda side
+ * is taken care of and so that a class can call the cuda algorithms easily and
+ * this keeps the normal cpp and cuda separate
+ */
 class CudaCannyDetector {
 public:
+
+    /*!
+     * Constructor
+     * \param src The source image
+     * \param w The width of the image
+     * \param h The height of the image
+     * \param gaussKernelSize The size of the gaussian filter
+     * \param standardDeviation The standard deviation of the gaussian filter
+     * \param high The high threshold for double thresholding
+     * \param low The low threshold for double thresholding
+     */
     CudaCannyDetector(uint8_t* src,
                       int w,
                       int h,
@@ -32,12 +105,29 @@ public:
           m_low(low) {
         CannyEdgeDetection();
     }
+
+    /*!
+     * Function to get the timings of the algorithms
+     * \return The timings that has been calculated
+     */
     CannyTimings GetTimings() {
         return m_timings;
     }
 
 private:
+
+    /*!
+     * \class CudaTimers
+     * \brief Utility class to keep the cuda events for timings separate
+     *
+     * It creates and destroys the cuda events that are needed to calculate the
+     * running time of the algorithm
+     */
     struct CudaTimers {
+
+        /*!
+         * Constructor creates the cuda events
+         */
         CudaTimers() {
             cudaEventCreate(&GrayScale_start);
             cudaEventCreate(&GrayScale_stop);
@@ -56,6 +146,10 @@ private:
             cudaEventCreate(&All_start);
             cudaEventCreate(&All_stop);
         }
+
+        /*!
+         * Destructor deletes the cuda events
+         */
         ~CudaTimers() {
             cudaEventDestroy(GrayScale_start);
             cudaEventDestroy(GrayScale_stop);
@@ -92,6 +186,12 @@ private:
         cudaEvent_t All_stop;
     };
 
+    /*!
+     * The main function that class the cuda algorithms in order for the edge
+     * detection to happen
+     */
+    void CannyEdgeDetection();
+
     uint8_t* m_src;
     int m_w;
     int m_h;
@@ -101,6 +201,5 @@ private:
     float m_low;
     CudaTimers m_timers;
     CannyTimings m_timings;
-    void CannyEdgeDetection();
 };
 #endif //GPGPU_EDGE_DETECTOR_CUDA_INCLUDE_CUDA_EDGE_DETECTION_CUH_

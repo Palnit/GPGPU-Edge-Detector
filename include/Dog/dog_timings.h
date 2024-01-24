@@ -4,6 +4,10 @@
 
 #ifndef GPGPU_EDGE_DETECTOR_INCLUDE_DOG_DOG_TIMINGS_H_
 #define GPGPU_EDGE_DETECTOR_INCLUDE_DOG_DOG_TIMINGS_H_
+
+/*!
+ * Simple struct containing timings for the Different of Gaussian Edge detectors
+ */
 struct DogTimings {
     float GrayScale_ms;
     float Gauss1Creation_ms;
