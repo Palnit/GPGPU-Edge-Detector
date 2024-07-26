@@ -32,7 +32,7 @@ public:
      * \param flags Flags for the sdl window creation function SDL_WINDOW_OPENGL
      * is always appended
      */
-    MainWindow::MainWindow(const char* title,
+    MainWindow(const char* title,
                            int x,
                            int y,
                            int w,

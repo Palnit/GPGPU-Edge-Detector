@@ -8,6 +8,7 @@
 #include "include/general/OpenGL_SDL/generic_structs.h"
 
 #include <ctime>
+#include <algorithm>
 
 #include <cuda_runtime.h>
 
